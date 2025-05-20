@@ -1,5 +1,5 @@
 let
-  lib = import lib/lists.nix;
+  lib = import develop/lib/lists.nix;
 
   # recovery key (must be saved offline)
   recoveryKeys = [
