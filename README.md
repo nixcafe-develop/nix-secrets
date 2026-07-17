@@ -1,8 +1,40 @@
 # Nix Flake · Secrets Management
 
-> purr · git-hooks · agenix · ragenix · age · yubikey · reproducible · nix-flake
+> purr · git-hooks · agenix · age · yubikey · nix-flake
 
 Nix flake template for age-encrypted secret management — scaffold per-host and shared secret trees, lock them with hardware-backed keys, and keep the repo linted with pre-commit hooks.
+
+Part of the [develop-templates](https://github.com/nixcafe/develop-templates) collection (`nix flake init`-ready).
+
+## Quick Start
+
+### `nix flake init`
+
+```bash
+nix flake init -t "github:nixcafe/develop-templates#secrets" --refresh
+```
+
+Register an alias:
+```bash
+nix registry add beans "github:nixcafe/develop-templates"
+nix flake init -t beans#secrets
+```
+
+> **Tip**: With [cattery-modules](https://github.com/nixcafe/cattery-modules), `beans` is pre-registered.
+
+### Create from Template
+
+```bash
+gh repo create my-secrets --template nixcafe/nix-secrets --clone
+```
+
+### Enter the Dev Shell
+
+```bash
+direnv allow       # or: nix develop
+```
+
+Then add your public age key(s) to `develop/lib/keys/default.nix` and start encrypting secrets.
 
 ## What's Inside
 
@@ -14,24 +46,6 @@ Nix flake template for age-encrypted secret management — scaffold per-host and
 | `vim` / `neovim` / `nano` | Editors available in the dev shell |
 
 The dev shell provides `agenix` (with `age-plugin-yubikey`), a curated editor suite, and git hooks wired via **purr**. The shell hook automatically sets `EDITOR='code --wait'` when VS Code is detected outside an SSH session.
-
-## Quick Start
-
-```sh
-# Enter the dev shell
-nix develop
-
-# Add your public age key(s) to develop/lib/keys/default.nix
-
-# Encrypt a secret for a host
-agenix -e hosts/<hostname>/global/<service>/secret.age
-
-# Edit an existing secret
-agenix -e hosts/<hostname>/users/<user>/<service>/secret.age
-
-# Verify git hooks pass before commit
-nix flake check
-```
 
 ## Customizing
 
@@ -70,6 +84,7 @@ Add recipient public keys in `develop/lib/keys/default.nix`. The flake consumes 
 ├── secrets.nix                   # Age file declarations (hosts & shared)
 ├── statix.toml                   # statix linter config
 ├── .envrc                        # direnv integration
+├── .gitignore
 │
 ├── develop/                      # flake src (= ./develop)
 │   ├── checks/
