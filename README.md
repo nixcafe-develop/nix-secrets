@@ -25,7 +25,7 @@ nix flake init -t beans#secrets
 ### Create from Template
 
 ```bash
-gh repo create my-secrets --template nixcafe/nix-secrets --clone
+gh repo create my-secrets --template nixcafe-develop/nix-secrets --clone
 ```
 
 ### Enter the Dev Shell
