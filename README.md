@@ -1,6 +1,6 @@
 # Nix Flake · Secrets Management
 
-> purr · git-hooks · agenix · age · yubikey · nix-flake
+> purr · git-hooks · ragenix · age · yubikey · nix-flake
 
 Nix flake template for age-encrypted secret management — scaffold per-host and shared secret trees, lock them with hardware-backed keys, generate age files straight from `nix build` packages, and keep the repo linted with pre-commit hooks.
 
@@ -57,8 +57,10 @@ Replace the shipped **placeholder keys** with your real age/SSH recipient keys:
 | `secrets` | which encrypted `.age` files exist and how they are scoped (host / user keys) |
 | `ssh` | inputs for the `known-hosts` / `match-blocks` generators (`fromMachines`, `format`, extras) |
 | `generatedAgeFiles` | which `nix build` package output installs to which secret file |
+| `buildMachines` | optional Hydra build-machine entries for `lib.builders.mkBuildMachines` |
+| `hosts` | IP → hostname map derived from `lib/keys` endpoints |
 
-`secrets.nix` (ragenix entry point) and the generated-file recipients are both derived from `secrets` — you never edit the file list in two places.
+`secrets.nix` (ragenix / agenix entry point) and the generated-file recipients are both derived from `secrets` — you never edit the file list in two places.
 
 ## Generated Secrets
 
@@ -82,7 +84,7 @@ Recipients come from `secrets.nix` automatically, so a generated file can never 
 
 | Tool | Purpose |
 |------|---------|
-| `agenix` (ragenix) | age-encrypted secret management |
+| `ragenix` | age-encrypted secret management (agenix-compatible) |
 | `age-plugin-yubikey` | YubiKey hardware-backed encryption |
 | `age` | encryption used at build time by generated secrets |
 | `nixfmt` / `deadnix` / `statix` | Nix code quality (pre-commit hooks) |
@@ -117,8 +119,8 @@ Tweak `statix.toml` to relax or tighten lint rules.
 
 ```
 .
-├── flake.nix                     # Flake hub entrypoint (purr + git-hooks + ragenix)
-├── secrets.nix                   # ragenix entry point (derived from lib/settings)
+├── flake.nix                     # Flake hub entrypoint (purr + git-hooks)
+├── secrets.nix                   # ragenix / agenix entry point (derived from lib/settings)
 ├── statix.toml                   # statix linter config
 ├── .envrc                        # direnv integration
 ├── .gitignore
@@ -127,7 +129,7 @@ Tweak `statix.toml` to relax or tighten lint rules.
 │   ├── checks/
 │   │   └── git-hooks/            # pre-commit hooks (nixfmt, deadnix, statix)
 │   ├── shells/
-│   │   └── default/              # Dev shell definition + agenix + editors
+│   │   └── default/              # Dev shell definition + ragenix + editors
 │   ├── lib/
 │   │   ├── keys/                 # Recipient public keys (REPLACE placeholders!)
 │   │   ├── settings/             # Central config: secrets layout + ssh + generatedAgeFiles

@@ -1,12 +1,12 @@
 # Helpers that turn the secrets declared in `lib/settings` into per-file
-# recipient keys, and (via root `secrets.nix`) into the agenix/ragenix
+# recipient keys, and (via root `secrets.nix`) into the ragenix / agenix
 # secret attribute set.
 { lib, ... }:
 let
   keys = import ../keys/default.nix { inherit lib; };
 
   # The secrets layout declared centrally in `lib/settings`.
-  config = (import ../settings/default.nix).secrets;
+  config = (import ../settings/default.nix { inherit lib; }).secrets;
 
   mkPath = parts: lib.concatStringsSep "/" parts;
 
