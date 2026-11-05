@@ -8,17 +8,13 @@ let
   commitCheck = inputs.self.checks.${system}.git-hooks.shellHook;
 in
 pkgs.mkShell {
-  packages =
-    [
-      (inputs.agenix.packages.${system}.default.override {
-        plugins = [ pkgs.age-plugin-yubikey ];
-      })
-    ]
-    ++ (with pkgs; [
-      vim
-      neovim
-      nano
-    ]);
+  packages = with pkgs; [
+    ragenix
+    age-plugin-yubikey
+    vim
+    neovim
+    nano
+  ];
 
   shellHook = ''
     ${commitCheck}

@@ -1,9 +1,11 @@
-# agenix / ragenix entry point: turns the secrets declared in
+# ragenix / agenix entry point: turns the secrets declared in
 # `develop/lib/settings/default.nix` into the attribute set of
 # `"path" -> { publicKeys }` that the tooling expects. Do not edit the file
 # list here — edit `develop/lib/settings/default.nix` instead.
 let
-  pkgs = import <nixpkgs> { };
+  # Use the flake's pinned nixpkgs instead of relying on `<nixpkgs>` / NIX_PATH.
+  flake = builtins.getFlake (toString ./.);
+  pkgs = import flake.inputs.nixpkgs { };
   keys = import ./develop/lib/keys/default.nix { inherit (pkgs) lib; };
   lib = {
     inherit keys;

@@ -2,13 +2,17 @@
 # Central configuration for this repository.
 #
 # Every user-configurable value lives here so that:
-#   - `secrets.nix` / agenix(ragenix) read `secrets`
+#   - `secrets.nix` / ragenix read `secrets`
 #   - the age-encrypted build outputs read `generatedAgeFiles`
 #   - the SSH config generators read `ssh`
 #
 # Machine identities / keys / endpoints are declared separately in `lib/keys`.
 # ────────────────────────────────────────────────────────────────────────────
-{
+{ lib, ... }:
+let
+  keys = import ../keys/default.nix { inherit lib; };
+in
+rec {
   # ---------------------------------------------------------------------------
   # Secrets layout
   # ---------------------------------------------------------------------------
@@ -126,4 +130,26 @@
       file = "block_config.age";
     }
   ];
+
+  # ---------------------------------------------------------------------------
+  # Hydra build machines (`nix.buildMachines`)
+  # ---------------------------------------------------------------------------
+  # Optional entries consumed by consumers through
+  # `lib.builders.mkBuildMachines pkgs`. Leave empty if unused.
+  buildMachines = [ ];
+
+  # ---------------------------------------------------------------------------
+  # Machine-name → IP mapping (`networking.hosts` shape: IP → hostnames).
+  # ---------------------------------------------------------------------------
+  # Derived from `lib/keys` endpoints, so hosts are declared only once.
+  hosts =
+    lib.foldl'
+      (acc: m: if m.ip == null then acc else acc // { ${m.ip} = (acc.${m.ip} or [ ]) ++ [ m.name ]; })
+      { }
+      (
+        map (name: {
+          inherit name;
+          ip = (keys.hosts.${keys.machines.${name}.host}.endpoint or { }).hostName or null;
+        }) (lib.attrNames keys.machines)
+      );
 }

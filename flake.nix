@@ -7,11 +7,6 @@
       url = "https://flakehub.com/f/cachix/git-hooks.nix/0.1.*.tar.gz";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    agenix = {
-      url = "github:yaxitech/ragenix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   outputs =

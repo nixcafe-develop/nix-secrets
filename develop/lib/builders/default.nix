@@ -5,7 +5,7 @@
 # each `dest` against the secrets layout so it can never drift.
 { lib, ... }:
 let
-  settings = import ../settings/default.nix;
+  settings = import ../settings/default.nix { inherit lib; };
   secrets = import ../secrets/default.nix { inherit lib; };
   inherit (secrets) mkSharedSecretDest mkSharedSecretRecipients;
 
@@ -64,7 +64,40 @@ let
         inherit pkgs name text;
         recipients = mkSharedSecretRecipients entry.dest;
       };
+
+  # Hydra build machines with a `publicHostKey` derived from the raw
+  # `publicKey` line in `settings.buildMachines`.
+  #
+  # nix's SSHMaster `base64::decode`s the machines-file publicHostKey and
+  # writes the decoded bytes verbatim into a temp known_hosts file, so the
+  # field must be base64 of the *full* host key line ("ssh-ed25519 <base64>",
+  # i.e. the contents of ssh_host_*.pub), not of the bare key blob. Since nix
+  # has no `builtins.base64Encode`, the encoding is computed in a derivation
+  # (same pattern as atticd.nix / qemu-vm.nix). Callers pass `pkgs`.
+  mkBuildMachines =
+    pkgs:
+    map (
+      m:
+      lib.removeAttrs m [ "publicKey" ]
+      // (
+        if m.publicKey == null then
+          { }
+        else
+          {
+            publicHostKey = builtins.readFile (
+              pkgs.runCommand "base64-host-key-${m.hostName}" { } ''
+                printf '%s' "${m.publicKey}" | base64 -w0 > $out
+              ''
+            );
+          }
+      )
+    ) settings.buildMachines;
 in
 {
-  inherit generatedAgeFiles mkAgeEncrypted mkGeneratedAgeEncrypted;
+  inherit
+    generatedAgeFiles
+    mkAgeEncrypted
+    mkGeneratedAgeEncrypted
+    mkBuildMachines
+    ;
 }
