@@ -1,7 +1,7 @@
 { lib, ... }:
 let
   # ──────────────────────────────────────────────────────────────────────────
-  # Placeholder keys — REPLACE EVERYTHING below with your real recipient keys.
+  # Placeholder keys: replace everything below with your real recipient keys.
   # These are throwaway public keys that make the template buildable out of
   # the box; the private counterparts are NOT shipped.
   # ──────────────────────────────────────────────────────────────────────────
